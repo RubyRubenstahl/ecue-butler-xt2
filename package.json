@@ -2,10 +2,18 @@
   "name": "butler-xt2",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/butler-xt2.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "azure-iot-device": "^1.9.1",
+    "azure-iot-device-amqp": "^1.9.1",
+    "cheerio": "^1.0.0-rc.2",
+    "lodash": "^4.17.11",
+    "qs": "^6.6.0"
+  }
 }
