@@ -1,7 +1,7 @@
 {
-  "name": "butler-xt2",
-  "version": "1.0.0",
-  "description": "",
+  "name": "ecue-butler-xt2",
+  "version": "0.0.1",
+  "description": "HTTP Control of e:cue butler XT2 standalone.",
   "main": "src/butler-xt2.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
