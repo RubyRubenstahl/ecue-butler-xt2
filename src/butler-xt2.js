@@ -2,6 +2,9 @@ const axios = require("axios");
 const cheerio = require("cheerio");
 const qs = require("qs");
 const padStart = require("lodash/padStart");
+const { parseFromTimeZone, formatToTimeZone } = require("date-fns-timezone");
+
+const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 async function parseCuelistHtml(html) {
   const $ = cheerio.load(html);
@@ -55,7 +58,7 @@ async function parseSettings(html) {
     const year = Number(cell.children[6].attribs.value);
     const hour = Number(cell.children[8].attribs.value);
     const minute = Number(cell.children[10].attribs.value);
-    const time = new Date(year, month-1, day, hour, minute);
+    const time = new Date(year, month - 1, day, hour, minute);
     return time;
   }
 
@@ -114,7 +117,7 @@ ButlerXT2.prototype.fetchSettings = async function fetchCuelistData() {
   await axios
     .post(
       `http://${this.host}/setup.htm`,
-      qs.stringify({ T30: "ecue", BENTER: "ENTER" }),
+      qs.stringify({ T30: this.password, BENTER: "ENTER" }),
       {
         headers: {
           Referer: `http://${this.host}/setup.htm`,
@@ -131,7 +134,48 @@ ButlerXT2.prototype.fetchSettings = async function fetchCuelistData() {
   return this.settings;
 };
 
+ButlerXT2.prototype.setTime = async function setTime({
+  dayOfWeek,
+  month,
+  day,
+  year,
+  hour,
+  minute
+}) {
+     console.log("setting ");
+
+  const queryString = qs.stringify({
+       T1: 'Woot',
+       D6_0: dayOfWeek,
+       D6_1: month,
+       D6_2: day,
+       D6_3: year,
+       D6_4: hour,
+       D6_5: minute,
+      
+        T10: this.password,
+        BSUBMIT: 'Submit',
+
+  });
+  console.log(queryString)
+     await axios
+       .post(`http://${this.host}/index.htm`, queryString, {
+         headers: {
+           Referer: `http://${this.host}/setup.htm`,
+           "Content-Type": "application/x-www-form-urlencoded"
+         }
+       })
+       .then(response => {
+         this.fetchSettings();
+        //  console.log(response)
+       })
+       .catch(err => {
+         console.log(err.message);
+       });
+   };
+
 ButlerXT2.prototype.playCuelist = async function playCuelist(cuelist) {
+
   const cuelistId = `B_P${padStart(cuelist, 2, 0)}`;
   const queryString = qs.stringify({ [cuelistId]: "Play" });
   await axios
