@@ -55,7 +55,7 @@ async function parseSettings(html) {
     const year = Number(cell.children[6].attribs.value);
     const hour = Number(cell.children[8].attribs.value);
     const minute = Number(cell.children[10].attribs.value);
-    const time = new Date(year, month, day, hour, minute);
+    const time = new Date(year, month-1, day, hour, minute);
     return time;
   }
 
