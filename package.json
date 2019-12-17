@@ -10,8 +10,6 @@
   "license": "ISC",
   "dependencies": {
     "axios": "^0.18.0",
-    "azure-iot-device": "^1.9.1",
-    "azure-iot-device-amqp": "^1.9.1",
     "cheerio": "^1.0.0-rc.2",
     "lodash": "^4.17.11",
     "qs": "^6.6.0"
