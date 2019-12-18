@@ -2,9 +2,11 @@ const axios = require("axios");
 const cheerio = require("cheerio");
 const qs = require("qs");
 const padStart = require("lodash/padStart");
-const { parseFromTimeZone, formatToTimeZone } = require("date-fns-timezone");
 
-const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+const http = axios.create({
+  timeout:2000
+})
 
 async function parseCuelistHtml(html) {
   const $ = cheerio.load(html);
@@ -107,14 +109,14 @@ function ButlerXT2({ host = "192.168.123.1", password = "ecue" }) {
 }
 
 ButlerXT2.prototype.fetchCuelistData = async function fetchCuelistData() {
-  return await axios
+  return await http
     .get(`http://${this.host}/cldir.htm`)
     .then(response => parseCuelistHtml(response.data))
     .then(cuelists => (this.cuelists = cuelists));
 };
 
 ButlerXT2.prototype.fetchSettings = async function fetchCuelistData() {
-  await axios
+  await http
     .post(
       `http://${this.host}/setup.htm`,
       qs.stringify({ T30: this.password, BENTER: "ENTER" }),
@@ -142,23 +144,24 @@ ButlerXT2.prototype.setTime = async function setTime({
   hour,
   minute
 }) {
-     console.log("setting ");
+  console.log("setting ");
+  console.log(this.host)
 
   const queryString = qs.stringify({
        T1: 'Woot',
        D6_0: dayOfWeek,
-       D6_1: month,
-       D6_2: day,
+       D6_1: day,
+       D6_2: month,
        D6_3: year,
        D6_4: hour,
        D6_5: minute,
       
-        T10: this.password,
+        // T10: this.password,
         BSUBMIT: 'Submit',
 
   });
   console.log(queryString)
-     await axios
+     await http
        .post(`http://${this.host}/index.htm`, queryString, {
          headers: {
            Referer: `http://${this.host}/setup.htm`,
@@ -178,7 +181,7 @@ ButlerXT2.prototype.playCuelist = async function playCuelist(cuelist) {
 
   const cuelistId = `B_P${padStart(cuelist, 2, 0)}`;
   const queryString = qs.stringify({ [cuelistId]: "Play" });
-  await axios
+  await http
     .post(`http://${this.host}/cldir.htm`, queryString, {
       headers: {
         Referer: `http://${this.host}/cldir.htm`,
@@ -199,7 +202,7 @@ ButlerXT2.prototype.setCuelistLevel = async function setCuelistLevel(
 ) {
   const cuelistId = `I_S${padStart(cuelist, 2, 0)}`;
   const queryString = qs.stringify({ [cuelistId]: level });
-  await axios
+  await http
     .post(`http://${this.host}/cldir.htm`, queryString, {
       headers: {
         Referer: `http://${this.host}/cldir.htm`,
